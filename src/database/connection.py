@@ -22,6 +22,11 @@ class DatabaseConnection:
 
         try:
             config = configparser.ConfigParser()
+            
+            # Pokud existuje config_local.ini, použij ten (pro lokální hesla)
+            if os.path.exists('config_local.ini'):
+                config_file = 'config_local.ini'
+            
             if not os.path.exists(config_file):
                 raise FileNotFoundError(f"Konfigurační soubor '{config_file}' nebyl nalezen!")
             
