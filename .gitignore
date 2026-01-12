@@ -33,5 +33,4 @@ logs.txt
 *.json
 !data/*.csv
 !data/*.json
-config.ini
 config_local.ini
