@@ -1,0 +1,112 @@
+# TESTOVACÍ SCÉNÁŘ #1 - Instalace a základní nastavení
+
+## Cíl
+Ověřit správné nastavení a spuštění aplikace s databází.
+
+## Předpoklady
+- Windows 10+
+- MySQL 5.7+ nainstalován a spuštěn
+- Python 3.7+
+
+## Kroky
+
+### 1. Příprava databáze
+
+**1.1** Otevřete MySQL příkazový řádek:
+```bash
+mysql -u root -p
+```
+(Zadejte heslo MySQL)
+
+**1.2** Vytvoření databáze a importu schématu:
+```sql
+SOURCE db/schema.sql;
+```
+Expected: ✓ Databáze `eshop` byla vytvořena s 6 tabulkami a 2 views
+
+**1.3** Import vzorových dat:
+```sql
+USE eshop;
+SOURCE db/sample_data.sql;
+```
+Expected: ✓ 5 kategorií, 10 produktů, 5 zákazníků, 5 objednávek
+
+**1.4** Ověření dat:
+```sql
+SELECT COUNT(*) FROM kategorie;  -- Expected: 5
+SELECT COUNT(*) FROM produkty;   -- Expected: 10
+SELECT COUNT(*) FROM zakaznici;  -- Expected: 5
+SELECT COUNT(*) FROM objednavky; -- Expected: 5
+```
+
+### 2. Instalace Python závislostí
+
+**2.1** Otevřete PowerShell a přejděte do složky projektu:
+```powershell
+cd C:\Users\georg\OneDrive\Plocha\PV\DatabaseProject
+```
+
+**2.2** Instalace balíčků:
+```bash
+pip install -r requirements.txt
+```
+Expected: ✓ mysql-connector-python a configparser instalovány
+
+### 3. Konfigurace aplikace
+
+**3.1** Upravte soubor `config.ini`:
+```ini
+[database]
+host = localhost
+port = 3306
+user = root
+password = VAŠE_MYSQL_HESLO    <-- NASTAVIT
+database = eshop
+charset = utf8mb4
+```
+
+### 4. Spuštění aplikace
+
+**4.1** Spusťte aplikaci:
+```bash
+python src/main.py
+```
+
+Expected výstup:
+```
+======================================================================
+E-SHOP MANAGEMENT SYSTEM - Inicializace
+======================================================================
+✓ Připojení k databázi navázáno
+
+Aplikace je připravena k použití.
+
+======================================================================
+E-SHOP MANAGEMENT SYSTEM - CLI
+======================================================================
+...menu...
+```
+
+### 5. Základní test
+
+**5.1** V menu vyberte "1. Správa produktů" → "1. Vypsat všechny produkty"
+
+Expected: ✓ Zobrazí se seznam 10 produktů s názvy, cenami a dostupností
+
+**5.2** Vyberte "2. Správa zákazníků" → "1. Vypsat všechny zákazníky"
+
+Expected: ✓ Zobrazí se seznam 5 zákazníků
+
+**5.3** Vyberte "0. Konec"
+
+Expected: ✓ Aplikace se korektně ukončí zprávou "Sbohem!"
+
+## Výsledek
+- [x] Databáze je správně nastavena
+- [x] Python balíčky jsou instalovány
+- [x] Aplikace se spouští a připojuje k databázi
+- [x] Základní funkčnost je dostupná
+
+## Poznámky
+- Pokud dojde k chybě "Chyba konfigurace: Konfigurační soubor neobsahuje sekci 'database'", ujistěte se, že je `config.ini` v kořenové složce projektu
+- MySQL musí být spuštěn a dostupný na portu 3306

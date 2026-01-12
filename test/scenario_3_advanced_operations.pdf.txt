@@ -1,0 +1,247 @@
+# TESTOVACÍ SCÉNÁŘ #3 - Pokročilé funkce (Transakce, Reporty, Import)
+
+## Cíl
+Ověřit transakce, reporty a import/export funkčnosti.
+
+## Předpoklady
+- Aplikace je spuštěna
+- Databáze obsahuje ukázková data (Scénář 1)
+
+## ČÁST A: TRANSAKCE - Vytvoření objednávky
+
+### Test A1: Vytvoření objednávky s více položkami (TRANSAKCE!)
+
+**Akce:**
+1. Menu → 4. Správa objednávek → 3. Vytvořit novou objednávku
+2. ID zákazníka: "1" (Jan Novotný)
+3. Přidejte položky:
+   - ID produktu: 2 (Myš), Počet: 3
+   - ID produktu: 3 (Klávesnice), Počet: 1
+4. Poznámka: "Test objednávky s transakcí"
+
+Expected: ✓ Objednávka #6 byla vytvořena (nové ID)
+- Cena bez DPH se sčítá z položek
+- Cena s DPH se vypočte automaticky
+
+**Ověření v databázi:**
+```sql
+SELECT * FROM objednavky WHERE id_objednavky = 6;
+SELECT COUNT(*) FROM polozky_objednavek WHERE id_objednavky = 6; -- Expected: 2
+```
+
+### Test A2: Ověření vrácení skladů
+
+**Akce:**
+1. Před objednávkou si poznamenejte skladový stav produktu 2 a 3
+2. Vytvořte objednávku (z Test A1)
+3. Zkontrolujte skladové stavy
+
+**Expected:** ✓ Zásoby se snížily o počet objednaných kusů
+
+**Ověření v CLI:**
+1. Menu → 1. Správa produktů → 2. Detail produktu
+2. ID: 2
+
+Expected: Skladem se snížilo o 3 kusy
+
+### Test A3: Zrušení objednávky (TRANSAKCE!)
+
+**Akce:**
+1. Menu → 4. Správa objednávek → 4. Zrušit objednávku
+2. ID: 6 (objednávka z Test A1)
+3. Potvrzení: "ano"
+
+Expected: ✓ "Objednávka #6 byla zrušena"
+
+**Ověření zrušení:**
+1. Menu → 4. Správa objednávek → 2. Detail objednávky
+2. ID: 6
+
+Expected: Stav objednávky je nyní "zrusena"
+
+**Ověření vrácení skladů:**
+1. Menu → 1. Správa produktů → 2. Detail
+2. ID: 2
+
+Expected: Skladem se vrátilo zpět do původního stavu (transakce funguje!)
+
+## ČÁST B: REPORTY - Agregace dat
+
+### Test B1: Report objednávek a tržeb
+
+**Akce:**
+1. Menu → 5. Reporty → 1. Report objednávek a tržeb
+
+Expected: ✓ Zobrazí se tabulka s:
+- Počet objednávek pro každý stav
+- Počet zákazníků
+- Celkem položek
+- Min/Max/Avg ceny
+- Celkové tržby
+
+**Kontrola dat:**
+- "dorucena": 1 objednávka
+- "zaplacena": 1 objednávka
+- "nova": 1 objednávka
+- "vyrazena": 1 objednávka
+- "potvrzena": 1 objednávka
+
+### Test B2: Report populárních produktů
+
+**Akce:**
+1. Menu → 5. Reporty → 2. Report nejpopulárnějších produktů
+
+Expected: ✓ Zobrazí se TOP 10 produktů podle počtu prodaných kusů
+- Sloupce: Název, Prodáno ks, Objem (Kč), Průměrná cena
+
+### Test B3: Report skladových stavů
+
+**Akce:**
+1. Menu → 5. Reporty → 3. Report skladových stavů
+
+Expected: ✓ Zobrazí se všechny produkty seřazené podle dostupnosti:
+- Vyprodáno (skladem = 0)
+- Kritické (skladem < 5)
+- Nízké (skladem < 20)
+- Dostupné (skladem >= 20)
+
+**Expected** seznam:
+1. Světlo LED 50W - Vyprodáno (skladem = 0)
+2. Monitory 27" UHD - Dostupné (skladem = 8)
+3. ...
+
+## ČÁST C: IMPORT DAT
+
+### Test C1: Import produktů z CSV
+
+**Příprava:**
+- Soubor `data/produkty_import.csv` již existuje
+
+**Akce:**
+1. Menu → 6. Import/Export dat → 1. Importovat produkty (CSV)
+2. Cesta: "data/produkty_import.csv"
+
+Expected: ✓ "Importováno 10 produktů z data/produkty_import.csv"
+
+**Ověření:**
+1. Menu → 1. Správa produktů → 1. Vypsat všechny produkty
+
+Expected: ✓ "Celkem: 20 produktů" (10 původních + 10 importovaných)
+
+### Test C2: Import produktů z JSON
+
+**Příprava:**
+- Soubor `data/produkty_import.json` již existuje
+
+**Akce:**
+1. Menu → 6. Import/Export dat → 2. Importovat produkty (JSON)
+2. Cesta: "data/produkty_import.json"
+
+Expected: ✓ "Importováno 3 produktů z data/produkty_import.json"
+
+**Ověření:**
+1. Menu → 1. Správa produktů → 1. Vypsat všechny produkty
+
+Expected: ✓ "Celkem: 23 produktů"
+
+### Test C3: Import zákazníků z CSV
+
+**Příprava:**
+- Soubor `data/zakaznici_import.csv` již existuje
+
+**Akce:**
+1. Menu → 6. Import/Export dat → 3. Importovat zákazníky (CSV)
+2. Cesta: "data/zakaznici_import.csv"
+
+Expected: ✓ "Importováno 4 zákazníků z data/zakaznici_import.csv"
+
+**Ověření:**
+1. Menu → 3. Správa zákazníků → 1. Vypsat všechny zákazníky
+
+Expected: ✓ "Celkem: 9 zákazníků" (5 původních + 4 importovaných)
+
+### Test C4: Export produktů do CSV
+
+**Akce:**
+1. Menu → 6. Import/Export dat → 4. Exportovat produkty (CSV)
+2. Cesta: "data/produkty_export.csv"
+
+Expected: ✓ "Exportováno 23 produktů do data/produkty_export.csv"
+
+**Ověření:**
+- Zkontrolujte, že soubor `data/produkty_export.csv` existuje
+- Otevřete ho v textovém editoru a ověřte, že obsahuje všechny produkty
+
+## ČÁST D: ERROR HANDLING - Chybové situace
+
+### Test D1: Import neexistujícího souboru
+
+**Akce:**
+1. Menu → 6. Import/Export dat → 1. Importovat produkty (CSV)
+2. Cesta: "data/neexistujici_soubor.csv"
+
+Expected: ✗ "Soubor 'data/neexistujici_soubor.csv' nebyl nalezen!"
+
+### Test D2: Vytvoření objednávky pro neexistujícího zákazníka
+
+**Akce:**
+1. Menu → 4. Správa objednávek → 3. Vytvořit objednávku
+2. ID zákazníka: 99999 (neexistuje)
+3. ID produktu: 1
+4. Počet: 1
+
+Expected: ✗ "Zákazník ID 99999 neexistuje!"
+
+### Test D3: Objednávka s více kusy než je na skladě
+
+**Akce:**
+1. Menu → 4. Správa objednávek → 3. Vytvořit objednávku
+2. ID zákazníka: 1
+3. ID produktu: 10 (Světlo LED - 0 na skladě)
+4. Počet: 5
+
+Expected: ✗ "Produkt není dostupný v požadovaném množství! Na skladě: 0, požadováno: 5"
+
+### Test D4: Duplikátní email
+
+**Akce:**
+1. Menu → 3. Správa zákazníků → 3. Přidat zákazníka
+2. Email: "jan.novotny@email.com" (již existuje)
+3. Ostatní údaje: jakékoliv
+
+Expected: ✗ Chyba databáze o duplicitním klíči (UNIQUE constraint)
+
+## ČÁST E: DATOVÉ TYPY - Ověření všech typů
+
+### Test E1: Reálné číslo (FLOAT)
+- Cena bez DPH: 1999.99 ✓
+- Sazba DPH: 21.00 ✓
+
+### Test E2: Logická hodnota (BOOLEAN)
+- je_aktivni: true/false ✓
+
+### Test E3: Výčet (ENUM)
+- typ_produktu: 'fyzicka', 'digitalni', 'sluzba' ✓
+- stav objednávky: 'nova', 'potvrzena', 'zaplacena', 'vyrazena', 'dorucena', 'zrusena' ✓
+
+### Test E4: Řetězec (VARCHAR)
+- nazev produktu, email, adresa ✓
+
+### Test E5: Datum/Čas (DATETIME)
+- casova_znamka_vytvoreni: 2024-01-08 12:30:45 ✓
+- vytvoreno: automaticky se vyplňuje ✓
+
+## Výsledek
+- [x] Transakce fungují (vytvoření a zrušení objednávky)
+- [x] Vrácení skladů se provádí atomicky
+- [x] Reporty agregují data ze 3+ tabulek
+- [x] Import z CSV a JSON funguje
+- [x] Export do CSV funguje
+- [x] Error handling je implementován
+- [x] Všechny datové typy jsou použity
+
+## Poznámky
+- Transakce zajišťují, že buď se všechno uloží, nebo se nic nezmění
+- Reporty pracují s SQL agregacemi (COUNT, SUM, AVG, MIN, MAX)
+- Import chybující řádky loguje a pokračuje
+- Všechny vstupní chyby jsou ošetřeny validátory

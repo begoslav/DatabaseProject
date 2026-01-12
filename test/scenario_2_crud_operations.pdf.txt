@@ -1,0 +1,161 @@
+# TESTOVACÍ SCÉNÁŘ #2 - CRUD operace a základní funkčnost
+
+## Cíl
+Otestovat všechny základní CRUD operace (Create, Read, Update, Delete) na všech entitách.
+
+## Předpoklady
+- Aplikace je spuštěna
+- Databáze je připravena (viz Scénář 1)
+
+## Část A: Správa produktů
+
+### Test A1: Přidání nového produktu
+
+**Akce:**
+1. Menu → 1. Správa produktů → 3. Přidat nový produkt
+2. Zadejte:
+   - Název: "Test Produkt"
+   - Popis: "Testovací produkt"
+   - Cena bez DPH: "1999.99"
+   - Počet kusů: "10"
+   - DPH %: [Enter - default 21]
+   - Typ: [Enter - default fyzicka]
+
+Expected: ✓ "Produkt 'Test Produkt' byl přidán (ID: 11)"
+
+### Test A2: Zobrazení seznamu produktů
+
+**Akce:**
+1. Menu → 1. Správa produktů → 1. Vypsat všechny produkty
+
+Expected: ✓ "Celkem: 11 produktů" (včetně nově přidaného)
+
+### Test A3: Zobrazení detailu produktu
+
+**Akce:**
+1. Menu → 1. Správa produktů → 2. Zobrazit detail produktu
+2. ID: "11"
+
+Expected: ✓ Zobrazí se detail s:
+- Jménem: "Test Produkt"
+- Cenou bez DPH: 1999.99 Kč
+- Cenou s DPH: 2419.99 Kč
+- Na skladě: 10 ks
+
+### Test A4: Aktualizace produktu
+
+**Akce:**
+1. Menu → 1. Správa produktů → 4. Aktualizovat produkt
+2. ID: "11"
+3. Nový název: "Aktualizovaný Test"
+4. Nová cena: "2499.99"
+5. Nový počet kusů: "5"
+
+Expected: ✓ "Produkt 'Aktualizovaný Test' byl aktualizován"
+
+### Test A5: Ověření úpravy
+
+**Akce:**
+1. Menu → 1. Správa produktů → 2. Zobrazit detail
+2. ID: "11"
+
+Expected: ✓ Zobrazí se aktualizované údaje
+
+### Test A6: Smazání produktu
+
+**Akce:**
+1. Menu → 1. Správa produktů → 5. Smazat produkt
+2. ID: "11"
+3. Potvrzení: "ano"
+
+Expected: ✓ "Produkt 'Aktualizovaný Test' byl smazán"
+
+### Test A7: Ověření smazání
+
+**Akce:**
+1. Menu → 1. Správa produktů → 1. Vypsat všechny produkty
+
+Expected: ✓ "Celkem: 10 produktů" (smazaný je pryč)
+
+## Část B: Správa kategorií
+
+### Test B1: Přidání kategorie
+
+**Akce:**
+1. Menu → 2. Správa kategorií → 2. Přidat novou kategorii
+2. Název: "Test Kategorie"
+3. Popis: "Testovací kategorie"
+
+Expected: ✓ "Kategorie 'Test Kategorie' byla přidána"
+
+### Test B2: Seznam kategorií
+
+**Akce:**
+1. Menu → 2. Správa kategorií → 1. Vypsat všechny kategorie
+
+Expected: ✓ "Celkem: 6 kategorií" (včetně nové)
+
+## Část C: Správa zákazníků
+
+### Test C1: Přidání zákazníka
+
+**Akce:**
+1. Menu → 3. Správa zákazníků → 3. Přidat nového zákazníka
+2. Jméno: "Tomáš"
+3. Příjmení: "Testovací"
+4. Email: "tomas.testovaci@email.com"
+5. Telefon: "777555444"
+6. Adresa: "Ulice Číslo 123"
+7. Město: "Praha"
+8. PSČ: "110 00"
+9. Stav: "Praha"
+
+Expected: ✓ "Zákazník 'Tomáš Testovací' byl přidán"
+
+### Test C2: Zobrazení detailu
+
+**Akce:**
+1. Menu → 3. Správa zákazníků → 2. Zobrazit detail zákazníka
+2. Najděte ID nově přidaného zákazníka (svisejte do seznamu)
+
+Expected: ✓ Zobrazí se kompletní údaje
+
+## Část D: Validace vstupů
+
+### Test D1: Neplatný email
+
+**Akce:**
+1. Menu → 3. Správa zákazníků → 3. Přidat
+2. Email: "neplatnakupa.cz" (bez @)
+3. Ostatní údaje normálně
+
+Expected: ✗ "Neplatný formát emailu!"
+
+### Test D2: Neplatné PSČ
+
+**Akce:**
+1. Menu → 3. Správa zákazníků → 3. Přidat
+2. Email: "valid@email.com"
+3. PSČ: "12345" (chybný formát)
+
+Expected: ✗ "Neplatný formát PSČ"
+
+### Test D3: Neplatná cena produktu
+
+**Akce:**
+1. Menu → 1. Správa produktů → 3. Přidat
+2. Cena: "0"
+
+Expected: ✗ "Cena musí být kladné číslo!"
+
+## Výsledek
+- [x] CRUD operace na produktech fungují
+- [x] CRUD operace na zákaznících fungují
+- [x] Kategorie se správně přidávají
+- [x] Validace vstupů funguje
+- [x] Aktualizace a smazání pracují správně
+
+## Poznámky
+- Neplatný formát PSČ by měl být "XXX XX"
+- Email musí obsahovat @ a doménu
+- Všechny ceny musí být > 0

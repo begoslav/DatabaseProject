@@ -1,0 +1,26 @@
+[
+  {
+    "nazev": "Monitor USB Type-C",
+    "popis": "Přenosný monitor s USB-C",
+    "cena_bez_dph": 4999.00,
+    "sazba_dph": 21.00,
+    "skladem": 8,
+    "typ_produktu": "fyzicka"
+  },
+  {
+    "nazev": "Přepěťová ochrana 6zásuvka",
+    "popis": "Přepěťová ochrana s 6 zásuvkami",
+    "cena_bez_dph": 299.00,
+    "sazba_dph": 21.00,
+    "skladem": 50,
+    "typ_produktu": "fyzicka"
+  },
+  {
+    "nazev": "Kabelový organizér",
+    "popis": "Sada na uspořádání kabelů",
+    "cena_bez_dph": 199.00,
+    "sazba_dph": 21.00,
+    "skladem": 60,
+    "typ_produktu": "fyzicka"
+  }
+]
